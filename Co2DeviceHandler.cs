@@ -20,7 +20,7 @@ namespace co2monitor {
 
 		public int sendReport(UsbDevice usbDevice, byte[] report) {
 			using (UsbEndpointWriter writer = usbDevice.OpenEndpointWriter(WriteEndpointID.Ep01)) {
-				writer.Write(report, timeout: 5000, out int bytesWritten);
+				writer.Write(report, 5000, out int bytesWritten);
 				return bytesWritten;
 			}	
 		}
@@ -31,7 +31,7 @@ namespace co2monitor {
 		public int readData(UsbDevice usbDevice, out byte[] readBuffer) {
 			using (UsbEndpointReader reader = usbDevice.OpenEndpointReader(ReadEndpointID.Ep01)) {
 				readBuffer = new byte[8];
-				reader.Read(readBuffer, timeout: 5000, out int bytesLength);					
+				reader.Read(readBuffer, 5000, out int bytesLength);					
 				return bytesLength;
 			}							
 		}
