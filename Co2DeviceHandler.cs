@@ -6,8 +6,7 @@ namespace co2monitor {
 		//null or UsbDevice
 		public UsbDevice openDevice(int vendor, int productID) {
 			var usbFinder = new UsbDeviceFinder(vendor, productID);
-			UsbDevice newUsbDevice = UsbDevice.OpenUsbDevice(usbFinder);
-			return newUsbDevice;
+			return UsbDevice.OpenUsbDevice(usbFinder);
 		}
 
 		public void setIfWhole(UsbDevice usbDevice) {

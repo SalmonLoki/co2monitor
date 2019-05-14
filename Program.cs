@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using LibUsbDotNet;
+using LibUsbDotNet.Info;
+using LibUsbDotNet.Main;
 
 namespace co2monitor {
     class Program {
@@ -24,7 +27,7 @@ namespace co2monitor {
 
                 int bytesLength = co2DeviceHandler.readData(usbDevice, out dataBuffer);
                 if (bytesLength == 0) {
-                    Console.WriteLine(value: "Unable to connect CO2 monitor");
+                    Console.WriteLine(value: "Unable to read datar");
                     break;
                 }
                 if (bytesLength != 8) {
@@ -60,8 +63,30 @@ namespace co2monitor {
                 co2DeviceHandler.closeDevice(usbDevice);            
             }
         }
-        
+
         static void Main(string[] args) {
+            UsbRegDeviceList allDevices = UsbDevice.AllDevices;
+            foreach (UsbRegistry usbRegistry in allDevices) {
+                UsbDevice MyUsbDevice;
+                if (usbRegistry.Open(out MyUsbDevice)) {
+                    Console.WriteLine(MyUsbDevice.Info.ToString());
+                    for (int iConfig = 0; iConfig < MyUsbDevice.Configs.Count; iConfig++) {
+                        UsbConfigInfo configInfo = MyUsbDevice.Configs[iConfig];
+                        Console.WriteLine(configInfo.ToString());
+
+                        ReadOnlyCollection<UsbInterfaceInfo> interfaceList = configInfo.InterfaceInfoList;
+                        for (int iInterface = 0; iInterface < interfaceList.Count; iInterface++) {
+                            UsbInterfaceInfo interfaceInfo = interfaceList[iInterface];
+                            Console.WriteLine(interfaceInfo.ToString());
+
+                            ReadOnlyCollection<UsbEndpointInfo> endpointList = interfaceInfo.EndpointInfoList;
+                            for (int iEndpoint = 0; iEndpoint < endpointList.Count; iEndpoint++) {
+                                Console.WriteLine(endpointList[iEndpoint].ToString());
+                            }
+                        }
+                    }
+                }
+            }
             int unused = args.Length;
             co2DeviceHandler = new Co2DeviceHandler();
             dataProcessor = new DataProcessor();
