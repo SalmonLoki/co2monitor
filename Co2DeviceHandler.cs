@@ -2,9 +2,7 @@ using LibUsbDotNet;
 using LibUsbDotNet.Main;
 
 namespace co2monitor {
-	public class Co2Device : ICo2Device {
-		//byte[] readBuffer;
-		
+	public class Co2DeviceHandler : ICo2DeviceHandler {	
 		//null or UsbDevice
 		public UsbDevice openDevice(int vendor, int productID) {
 			var usbFinder = new UsbDeviceFinder(vendor, productID);
@@ -31,9 +29,10 @@ namespace co2monitor {
 		
 		public void closeDevice(UsbDevice usbDevice) {
 			usbDevice.Close();
+		}
+
+		public void exit() {
 			UsbDevice.Exit();
-					
-			//Console.ReadKey();
 		}
 	}
 }
