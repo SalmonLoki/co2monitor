@@ -7,6 +7,9 @@ namespace co2monitor {
 
 		void setIfWhole(UsbDevice usbDevice);
 
+		//device won't send anything before receiving this packet
+		int sendReport(UsbDevice usbDevice, byte[] report);
+
 		//0 or more bytes read, readBuffer changed
 		int readData(UsbDevice usbDevice, out byte[] readBuffer);
 

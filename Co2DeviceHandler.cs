@@ -18,7 +18,16 @@ namespace co2monitor {
 			wholeUsbDevice?.ClaimInterface(interfaceID: 0);
 		}
 
+		public int sendReport(UsbDevice usbDevice, byte[] report) {
+			using (UsbEndpointWriter writer = usbDevice.OpenEndpointWriter(WriteEndpointID.Ep01)) {
+				writer.Write(report, timeout: 5000, out int bytesWritten);
+				return bytesWritten;
+			}	
+		}
+
 		//0 or more bytes read, readBuffer changed
+		//8-byte packets of data
+		//there's report types that contain 8 items of values 0 through 255 each. In other words: 8 bytes
 		public int readData(UsbDevice usbDevice, out byte[] readBuffer) {
 			using (UsbEndpointReader reader = usbDevice.OpenEndpointReader(ReadEndpointID.Ep01)) {
 				readBuffer = new byte[8];
