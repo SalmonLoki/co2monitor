@@ -2,44 +2,38 @@ using LibUsbDotNet;
 using LibUsbDotNet.Main;
 
 namespace co2monitor {
-	public class CO2device : ICO2device {
-		public static UsbDevice usbDevice;
-
-		public int init() {
-			UsbRegDeviceList allDevices = UsbDevice.AllDevices;
-			throw new System.NotImplementedException();
+	public class Co2Device : ICo2Device {
+		//byte[] readBuffer;
+		
+		//null or UsbDevice
+		public UsbDevice openDevice(int vendor, int productID) {
+			var usbFinder = new UsbDeviceFinder(vendor, productID);
+			UsbDevice newUsbDevice = UsbDevice.OpenUsbDevice(usbFinder);
+			return newUsbDevice;
 		}
 
-		public void exit() {
-			throw new System.NotImplementedException();
+		public void setIfWhole(UsbDevice usbDevice) {
+			//should setup whole usb-devices (LibUsbDevice, MonoUsbDevice,...)
+			//Partial or interfaces of devices are ok, driver is handling device configuration (WinUsbDevice,...)
+			var wholeUsbDevice = usbDevice as IUsbDevice;
+			wholeUsbDevice?.SetConfiguration(config: 1);
+			wholeUsbDevice?.ClaimInterface(interfaceID: 0);
 		}
 
-		UsbDevice ICO2device.openDevice() {
-			return openDevice();
+		//0 or more bytes read, readBuffer changed
+		public int readData(UsbDevice usbDevice, out byte[] readBuffer) {
+			using (UsbEndpointReader reader = usbDevice.OpenEndpointReader(ReadEndpointID.Ep01)) {
+				readBuffer = new byte[8];
+				reader.Read(readBuffer, timeout: 5000, out int bytesLength);					
+				return bytesLength;
+			}							
 		}
-
-		UsbDevice ICO2device.openPathDevice(string path) {
-			return openPathDevice(path);
-		}
-
-		public void closeDevice(UsbDevice device) {
-			throw new System.NotImplementedException();
-		}
-
-		public UsbDevice openDevice() {
-			throw new System.NotImplementedException();
-		}
-
-		public UsbDevice openPathDevice(string path) {
-			throw new System.NotImplementedException();
-		}
-
-		public void closeDevice(UsbDevice device) {
-			throw new System.NotImplementedException();
-		}
-
-		public int readData() {
-			throw new System.NotImplementedException();
+		
+		public void closeDevice(UsbDevice usbDevice) {
+			usbDevice.Close();
+			UsbDevice.Exit();
+					
+			//Console.ReadKey();
 		}
 	}
 }

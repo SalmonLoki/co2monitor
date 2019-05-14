@@ -1,17 +1,13 @@
 using LibUsbDotNet;
 
 namespace co2monitor {
-	public interface ICO2device {
-		int init();
-		
-		void exit();
-		
-		UsbDevice openDevice();
+	public interface ICo2Device {
+		UsbDevice openDevice(int vendor, int productID);
 
-		UsbDevice openPathDevice(string path);
+		void setIfWhole(UsbDevice usbDevice);
 
-		void closeDevice(UsbDevice device);
-		
-		int readData();
+		int readData(UsbDevice usbDevice, out byte[] readBuffer);
+
+		void closeDevice(UsbDevice usbDevice);
 	}
 }
