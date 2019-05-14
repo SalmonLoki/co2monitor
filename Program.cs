@@ -10,17 +10,18 @@ namespace co2monitor {
 
         private static void deviceLoop(UsbDevice usbDevice) {
             //the device won't send anything before receiving this packet
-            var report = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };           
+            //var report = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };   
+            var key = new byte[] { 0xc4, 0xc6, 0xc0, 0x92, 0x40, 0x23, 0xdc, 0x96 };
+            byte[] report = key;
             int bytesWritten = co2DeviceHandler.sendReport(usbDevice, report);
             if (bytesWritten != report.Length) {
-                Console.WriteLine(value: "Unable to send first report");
+                Console.WriteLine(value: "Unable to send report");
                 return;
             }
             
             while (true) {
                 byte[] dataBuffer;
-                byte[] data;
-                
+
                 int bytesLength = co2DeviceHandler.readData(usbDevice, out dataBuffer);
                 if (bytesLength == 0) {
                     Console.WriteLine(value: "Unable to connect CO2 monitor");
@@ -30,11 +31,8 @@ namespace co2monitor {
                     Console.WriteLine(value: "transferred amount of bytes != expected bytes amount");
                     break;
                 }
-
-                if (!dataProcessor.decryptData(ref dataBuffer, out data)) {
-                    Console.WriteLine(value: "Decryption failed");
-                    continue;
-                }
+                
+                int[] data = dataProcessor.decryptData(key, ref dataBuffer);
 
                 if (!dataProcessor.checkEndOfMessage(ref data)) {
                     Console.WriteLine(value: "Unexpected data from device");

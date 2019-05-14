@@ -1,11 +1,11 @@
 namespace co2monitor {
 	public interface IDataProcessor {
-		bool decryptData(ref byte[] dataBuffer, out byte[] data);
+		int[] decryptData(byte[] key, ref byte[] dataBuffer);
 		
-		bool checkEndOfMessage(ref byte[] data);
+		bool checkEndOfMessage(ref int[] data);
 
-		bool checkCheckSum(ref byte[] data);
+		bool checkCheckSum(ref int[] data);
 
-		void dataProcessing(ref byte[] data);
+		void dataProcessing(ref int[] data);
 	}
 }
