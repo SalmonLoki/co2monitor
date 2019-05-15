@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using LibUsbDotNet;
-using LibUsbDotNet.Info;
-using LibUsbDotNet.Main;
 
 namespace co2monitor {
     class Program {
-        private static int vendor = 0x04d9;
-        private static int productID = 0xa052;
+        private static int vendor = 0x1687; //0x04d9;
+        private static int productID = 0x6213; //0xa052;
         private static Co2DeviceHandler co2DeviceHandler;
         private static DataProcessor dataProcessor;
 
         private static void deviceLoop(UsbDevice usbDevice) {
-            //the device won't send anything before receiving this packet
-            //var report = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };   
+            //the device won't send anything before receiving this packet 
+            //var key = new byte[] { 0xc4, 0xc6, 0xc0, 0x92, 0x40, 0x23, 0xdc, 0x96 };
+           
             var key = new byte[] { 0xc4, 0xc6, 0xc0, 0x92, 0x40, 0x23, 0xdc, 0x96 };
-            byte[] report = key;
-            int bytesWritten = co2DeviceHandler.sendReport(usbDevice, report);
-            if (bytesWritten != report.Length) {
-                Console.WriteLine(value: "Unable to send report");
+            
+            int bytesWritten = co2DeviceHandler.sendReport(usbDevice, key);
+            if (bytesWritten != key.Length) {
+                Console.WriteLine(value: "Unable to send report: expected bytes amount = " + key.Length + ", written bytes amount = " + bytesWritten);
                 return;
             }
             
@@ -27,7 +25,7 @@ namespace co2monitor {
 
                 int bytesLength = co2DeviceHandler.readData(usbDevice, out dataBuffer);
                 if (bytesLength == 0) {
-                    Console.WriteLine(value: "Unable to read datar");
+                    Console.WriteLine(value: "Unable to read data");
                     break;
                 }
                 if (bytesLength != 8) {
@@ -64,10 +62,7 @@ namespace co2monitor {
             }
         }
 
-        static void Main(string[] args) {
-            UsbRegDeviceList allDevices = UsbDevice.AllDevices;
-            Console.WriteLine(allDevices.Count);
-            
+        static void Main(string[] args) {          
             int unused = args.Length;
             co2DeviceHandler = new Co2DeviceHandler();
             dataProcessor = new DataProcessor();

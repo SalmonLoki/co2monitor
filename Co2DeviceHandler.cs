@@ -1,3 +1,4 @@
+using System;
 using LibUsbDotNet;
 using LibUsbDotNet.Main;
 
@@ -19,8 +20,9 @@ namespace co2monitor {
 
 		public int sendReport(UsbDevice usbDevice, byte[] report) {
 			using (UsbEndpointWriter writer = usbDevice.OpenEndpointWriter(WriteEndpointID.Ep01)) {
-				writer.Write(report, 5000, out int bytesWritten);
-				return bytesWritten;
+				ErrorCode ec = writer.Write(report, 5000, out int bytesWritten);
+				if (ec != ErrorCode.None) throw new Exception(UsbDevice.LastErrorString);
+				return bytesWritten;			
 			}	
 		}
 
@@ -30,7 +32,8 @@ namespace co2monitor {
 		public int readData(UsbDevice usbDevice, out byte[] readBuffer) {
 			using (UsbEndpointReader reader = usbDevice.OpenEndpointReader(ReadEndpointID.Ep01)) {
 				readBuffer = new byte[8];
-				reader.Read(readBuffer, 5000, out int bytesLength);					
+				ErrorCode ec = reader.Read(readBuffer, 5000, out int bytesLength);	
+				if (ec != ErrorCode.None) throw new Exception(UsbDevice.LastErrorString);
 				return bytesLength;
 			}							
 		}
